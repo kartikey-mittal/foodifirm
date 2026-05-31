@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, useParams } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { StoreResolverLayout } from '@/components/layout/StoreResolverLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
@@ -36,6 +36,12 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   return <ProtectedRoute allowedUserTypes={[...adminTypes]}>{children}</ProtectedRoute>;
 }
 
+function StoreEntryRedirect() {
+  const { storeId } = useParams<{ storeId: string }>();
+  if (!storeId) return <Navigate to="/login" replace />;
+  return <Navigate to={`/store/${storeId}/customer-login`} replace />;
+}
+
 export const router = createBrowserRouter([
   // Public auth routes
   { path: '/login', element: <PublicRoute><LoginPage /></PublicRoute> },
@@ -43,6 +49,10 @@ export const router = createBrowserRouter([
   { path: '/forgot-password', element: <PublicRoute><ForgotPasswordPage /></PublicRoute> },
 
   // Store-specific public routes — /store/:storeId/...
+  {
+    path: '/store/:storeId',
+    element: <StoreEntryRedirect />,
+  },
   {
     path: '/store/:storeId/register',
     element: (
