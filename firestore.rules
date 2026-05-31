@@ -1,0 +1,194 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function getUserType() {
+      return isAuthenticated() ? getUserData().userType : null;
+    }
+
+    function isAdminOrRestaurant() {
+      return getUserType() in ['admin', 'restaurant'];
+    }
+
+    function isOwner(businessId) {
+      return isAuthenticated() && (
+        getUserData().businessId == businessId ||
+        getUserData().userType == 'admin'
+      );
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdminOrRestaurant());
+      allow create: if request.auth.uid == userId;
+      allow update: if request.auth.uid == userId || isAdminOrRestaurant();
+      allow delete: if false; // Not allowed
+    }
+
+    // Businesses collection
+    match /businesses/{businessId} {
+      allow read: if isAuthenticated() && isOwner(businessId);
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && isOwner(businessId);
+      allow delete: if false;
+    }
+
+    // Customers collection
+    match /customers/{customerId} {
+      allow read: if isAuthenticated() && (
+        isOwner(resource.data.businessId) ||
+        resource.data.userId == request.auth.uid
+      );
+      allow create: if isAuthenticated() && isOwner(request.resource.data.businessId);
+      allow update: if isAuthenticated() && (
+        isOwner(resource.data.businessId) ||
+        resource.data.userId == request.auth.uid
+      );
+      allow delete: if false;
+    }
+
+    // Subscriptions collection
+    match /subscriptions/{id} {
+      allow read: if isAuthenticated() && (
+        isOwner(resource.data.businessId) ||
+        exists(/databases/$(database)/documents/customers/$(resource.data.customerId)) &&
+        get(/databases/$(database)/documents/customers/$(resource.data.customerId)).data.userId == request.auth.uid
+      );
+      allow create: if isAuthenticated() && isOwner(request.resource.data.businessId);
+      allow update: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow delete: if false;
+    }
+
+    // Food Items collection
+    match /foodItems/{id} {
+      allow read: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow create: if isAuthenticated() && isOwner(request.resource.data.businessId);
+      allow update: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow delete: if false;
+    }
+
+    // Weekly Menus collection
+    match /weeklyMenus/{id} {
+      allow read: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow create: if isAuthenticated() && isOwner(request.resource.data.businessId);
+      allow update: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow delete: if false;
+    }
+
+    // Delivery Areas collection
+    match /deliveryAreas/{id} {
+      allow read: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow create: if isAuthenticated() && isOwner(request.resource.data.businessId);
+      allow update: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow delete: if false;
+    }
+
+    // Delivery Batches collection
+    match /deliveryBatches/{id} {
+      allow read: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow create: if isAuthenticated() && isOwner(request.resource.data.businessId);
+      allow update: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow delete: if false;
+    }
+
+    // Drivers collection
+    match /drivers/{id} {
+      allow read: if isAuthenticated() && (
+        isOwner(resource.data.businessId) ||
+        resource.data.userId == request.auth.uid
+      );
+      allow create: if isAuthenticated() && isOwner(request.resource.data.businessId);
+      allow update: if isAuthenticated() && (
+        isOwner(resource.data.businessId) ||
+        resource.data.userId == request.auth.uid
+      );
+      allow delete: if false;
+    }
+
+    // Deliveries collection
+    match /deliveries/{id} {
+      allow read: if isAuthenticated() && (
+        isOwner(resource.data.businessId) ||
+        resource.data.driverId == request.auth.uid ||
+        exists(/databases/$(database)/documents/customers/$(resource.data.customerId)) &&
+        get(/databases/$(database)/documents/customers/$(resource.data.customerId)).data.userId == request.auth.uid
+      );
+      allow create: if isAuthenticated() && isOwner(request.resource.data.businessId);
+      allow update: if isAuthenticated() && (
+        isOwner(resource.data.businessId) ||
+        resource.data.driverId == request.auth.uid
+      );
+      allow delete: if false;
+    }
+
+    // Invoices collection
+    match /invoices/{id} {
+      allow read: if isAuthenticated() && (
+        isOwner(resource.data.businessId) ||
+        exists(/databases/$(database)/documents/customers/$(resource.data.customerId)) &&
+        get(/databases/$(database)/documents/customers/$(resource.data.customerId)).data.userId == request.auth.uid
+      );
+      allow create: if isAuthenticated() && isOwner(request.resource.data.businessId);
+      allow update: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow delete: if false;
+    }
+
+    // Payments collection
+    match /payments/{id} {
+      allow read: if isAuthenticated() && (
+        isOwner(resource.data.businessId) ||
+        exists(/databases/$(database)/documents/customers/$(resource.data.customerId)) &&
+        get(/databases/$(database)/documents/customers/$(resource.data.customerId)).data.userId == request.auth.uid
+      );
+      allow create: if isAuthenticated() && isOwner(request.resource.data.businessId);
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // Notifications collection
+    match /notifications/{id} {
+      allow read: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow create: if isAuthenticated() && isOwner(request.resource.data.businessId);
+      allow update: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow delete: if false;
+    }
+
+    // System Alerts collection
+    match /systemAlerts/{id} {
+      allow read: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow create: if isAuthenticated() && isOwner(request.resource.data.businessId);
+      allow update: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow delete: if false;
+    }
+
+    // Activity Logs collection
+    match /activityLogs/{id} {
+      allow read: if isAuthenticated() && isOwner(resource.data.businessId);
+      allow create: if isAuthenticated() && isOwner(request.resource.data.businessId);
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // Business Stats collection
+    match /businessStats/{businessId} {
+      allow read: if isAuthenticated() && isOwner(businessId);
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && isOwner(businessId);
+      allow delete: if false;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
