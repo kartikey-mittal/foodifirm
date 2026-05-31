@@ -3,7 +3,7 @@ import {
   serverTimestamp, collection, query, where,
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
-import type { Delivery, DeliveryArea, DeliveryBatch, Driver } from '@/types';
+import type { BatchStatus, Delivery, DeliveryArea, DeliveryBatch, Driver } from '@/types';
 
 // Delivery Areas
 export async function getDeliveryAreas(businessId: string): Promise<DeliveryArea[]> {

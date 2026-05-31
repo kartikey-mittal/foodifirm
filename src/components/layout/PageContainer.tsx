@@ -2,8 +2,8 @@ import { cn } from '@/lib/utils';
 import type { ReactNode } from 'react';
 
 interface PageContainerProps {
-  title: string;
-  description?: string;
+  title: ReactNode;
+  description?: ReactNode;
   children: ReactNode;
   actions?: ReactNode;
   className?: string;

@@ -26,6 +26,7 @@ import {
   MapPin, Pencil, Wallet, Plus,
 } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import toast from 'react-hot-toast';
 import type {
   Customer, Subscription, Invoice, WeeklyMenu, DailyMealOrder,
   ServicePause, CustomerRequest, DeliveryArea, MenuDayItemDetail, WalletTransaction,
@@ -470,9 +471,9 @@ export function CustomerPortalHome() {
                     {!order && menuItems.length > 0 && (
                       <p className="text-[11px] text-gray-400 italic mt-1">Scheduled</p>
                     )}
-                    {order?.['items'] && (order as any).items.length > 0 && (
+                    {order?.mealItems && order.mealItems.length > 0 && (
                       <p className="text-[10px] text-gray-400 mt-1 truncate">
-                        {(order as any).items.join(', ')}
+                        {order.mealItems.join(', ')}
                       </p>
                     )}
                   </div>

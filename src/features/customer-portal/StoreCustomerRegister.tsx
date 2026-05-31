@@ -78,6 +78,7 @@ export function StoreCustomerRegister() {
         address: form.address,
         area: form.area,
         landmark: form.landmark,
+        weekendServiceRequired: false,
         status: 'pending_approval',
         subscriptionStatus: 'none',
         paymentStatus: 'pending',

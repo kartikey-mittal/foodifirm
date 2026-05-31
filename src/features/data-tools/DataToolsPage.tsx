@@ -187,9 +187,9 @@ export function DataToolsPage() {
     if (!business?.id) return;
     await runOp('Add Sample Customers (3)', async () => {
       const customers = [
-        { fullName: 'Rahul Sharma', email: 'rahul@test.com', phone: '+91 98765 43210', address: '123, 1st Main', area: 'Koramangala', userId: '', status: 'active' as const, subscriptionStatus: 'active' as const, paymentStatus: 'paid' as const },
-        { fullName: 'Priya Patel', email: 'priya@test.com', phone: '+91 98765 43211', address: '456, 2nd Cross', area: 'Indiranagar', userId: '', status: 'active' as const, subscriptionStatus: 'active' as const, paymentStatus: 'paid' as const },
-        { fullName: 'Amit Singh', email: 'amit@test.com', phone: '+91 98765 43212', address: '789, 3rd Block', area: 'Whitefield', userId: '', status: 'pending_approval' as const, subscriptionStatus: 'none' as const, paymentStatus: 'pending' as const },
+        { fullName: 'Rahul Sharma', email: 'rahul@test.com', phone: '+91 98765 43210', address: '123, 1st Main', area: 'Koramangala', userId: '', weekendServiceRequired: false, status: 'active' as const, subscriptionStatus: 'active' as const, paymentStatus: 'paid' as const },
+        { fullName: 'Priya Patel', email: 'priya@test.com', phone: '+91 98765 43211', address: '456, 2nd Cross', area: 'Indiranagar', userId: '', weekendServiceRequired: false, status: 'active' as const, subscriptionStatus: 'active' as const, paymentStatus: 'paid' as const },
+        { fullName: 'Amit Singh', email: 'amit@test.com', phone: '+91 98765 43212', address: '789, 3rd Block', area: 'Whitefield', userId: '', weekendServiceRequired: false, status: 'pending_approval' as const, subscriptionStatus: 'none' as const, paymentStatus: 'pending' as const },
       ];
       let count = 0;
       for (const c of customers) {
